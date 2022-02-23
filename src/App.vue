@@ -1,81 +1,66 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+	<h1>2048</h1>
+	<div class="wrapper">
+		<Infos />
+		<GameGrid />
+	</div>
 </template>
 
+<script setup lang="ts">
+import Infos from "./components/Infos.vue";
+import GameGrid from "./components/GameGrid.vue";
+
+// let truc = "machin";
+// truc = "bidule";
+
+// const editEmit = (data: string) => {
+// 	console.log(data);
+// };
+
+// const faitUnTruc = () => {
+// 	console.log("fait un truc");
+// };
+
+///// emit /////
+// type-based
+// const emit = defineEmits<{
+//   (e: 'change', id: number): void
+//   (e: 'update', value: string): void
+// }>()
+
+///// ref ////
+// import { ref, onMounted } from 'vue'
+// const el = ref<HTMLInputElement | null>(null)
+// onMounted(() => {
+//   el.value?.focus()
+// })
+//----------
+// const isContentShown = ref(false)
+// const open = () => (isContentShown.value = true)
+// defineExpose({
+//   open
+// })
+</script>
+
 <style>
-@import './assets/base.css';
+@import "./assets/base.css";
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
+	background-color: rgb(250, 248, 239);
+	margin: 0 auto;
+	padding: 2rem;
+	text-align: center;
+	font-weight: normal;
 }
-
-header {
-  line-height: 1.5;
+.wrapper {
+	width: 50vw;
+	height: 50vw;
+	display: flex;
+	flex-direction: column;
+	margin: auto;
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+.btn {
+	background-color: rgb(143, 122, 102);
+	color: rgb(250, 248, 239);
 }
 </style>
