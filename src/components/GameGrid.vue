@@ -1,54 +1,45 @@
 <template>
 	<button class="btn" @click="start">Start</button>
+	<p>score : {{ score }}</p>
 	<div class="grid">
-		<div class="row" v-for="row in gridContent">
+		<div class="row" v-for="(row, rowIndex) in gridContent">
 			<GameCell
-				v-for="(cell, index) in row"
+				v-for="(cell, cellIndex) in row"
 				:colLength="colLength"
-				:key="index"
+				:key="rowIndex.toString() + cellIndex.toString()"
 				:content="cell"
 			/>
 		</div>
 	</div>
-	<!-- <div v-if="gridTemplate.length" class="grid">
-		<GameCell
-			v-for="(cell, index) in gridTemplate"
-			:colLength="colLength"
-			:cell="cell"
-			:key="index"
-			:content="cell.numberValue"
-		/>
-	</div> -->
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onBeforeMount } from "vue";
 import GameCell from "./GameCell.vue";
 
-interface Cell {
-	row: number;
-	col: number;
-	numberValue: number;
-}
-
 const colLength = ref(4);
 const rowLength = ref(4);
-let gridTemplate = reactive([] as Cell[]);
 let gridContent = reactive([] as number[][]);
+let score = ref(0);
 
 onBeforeMount(() => {
 	for (let i = 0; i < rowLength.value; i++) {
 		gridContent.push([]);
 		for (let j = 0; j < colLength.value; j++) {
 			gridContent[i].push(0);
-			gridTemplate.push({ row: i, col: j, numberValue: 0 });
 		}
 	}
 });
 
 const start = () => {
-	gridTemplate.map((cell) => (cell.numberValue = 0));
-	gridContent.map((row) => row.map(() => 0));
+	gridContent[0] = [4, 0, 0, 0];
+	gridContent[1] = [4, 0, 0, 0];
+	gridContent[2] = [2, 0, 0, 0];
+	gridContent[3] = [2, 0, 0, 0];
+	// gridContent.map(
+	// 	(row, rowIndex) => (gridContent[rowIndex] = row.map(() => 0))
+	// );
+
 	fillRandomCell();
 	fillRandomCell();
 	window.addEventListener("keydown", (e) => {
@@ -78,19 +69,6 @@ const fillRandomCell = () => {
 	const randomNum = Math.floor(Math.random() * emptyCells.length);
 	gridContent[emptyCells[randomNum].row][emptyCells[randomNum].col] =
 		randomPopNumber();
-
-	// const emptyCells: Cell[] = gridTemplate.filter(
-	// 	(cell) => cell.numberValue === 0
-	// );
-	// const randomNum = Math.floor(Math.random() * emptyCells.length);
-	// emptyCells[randomNum].numberValue = randomPopNumber();
-	// const cell = gridTemplate.find(
-	// 	(c) =>
-	// 		c.row === emptyCells[randomNum].row && c.col === emptyCells[randomNum].col
-	// );
-	// if (cell) {
-	// 	gridTemplate.splice(gridTemplate.indexOf(cell), 1, emptyCells[randomNum]);
-	// }
 };
 
 const randomPopNumber = () => {
@@ -103,59 +81,149 @@ const randomPopNumber = () => {
 const move = (arrow: string) => {
 	// ArrowUp => row - 1
 	if (arrow === "ArrowUp") {
-		// let somethingUpEmpty = true;
-		// while (somethingUpEmpty) {
-		// somethingUpEmpty = false;
-		// if (change) => somethingUpEmpty = true;
-		// }
-		for (let i = 1; i < rowLength.value; i++) {
-			for (let j = 0; j < colLength.value; j++) {
-				if (gridContent[i - 1][j] === 0) {
-					gridContent[i - 1][j] = gridContent[i][j];
-					gridContent[i][j] = 0;
+		const moveUp = () => {
+			for (let i = 1; i < rowLength.value; i++) {
+				for (let j = 0; j < colLength.value; j++) {
+					if (gridContent[i][j] !== 0) {
+						let k = i - 1;
+						while (k > -1 && gridContent[k][j] === 0) {
+							k--;
+						}
+						const temp = gridContent[i][j];
+						gridContent[i][j] = 0;
+						gridContent[k + 1][j] = temp;
+					}
 				}
 			}
-		}
+		};
+		const mergeUp = () => {
+			for (let i = 1; i < rowLength.value; i++) {
+				for (let j = 0; j < colLength.value; j++) {
+					if (gridContent[i - 1][j] === gridContent[i][j]) {
+						score.value += gridContent[i - 1][j] * 2;
+						gridContent[i - 1][j] = gridContent[i - 1][j] * 2;
+						gridContent[i][j] = 0;
+					}
+				}
+			}
+		};
+
+		moveUp();
+		mergeUp();
+		moveUp();
+		fillRandomCell();
 	}
 
-	// console.log(arrow);
-	// for (let i = 1; i < rowLength.value; i++) {
-	// 	for (let j = 0; j < colLength.value; j++) {
-	// 		if (gridTemplate {row:i-1, col:j} => numberValue === 0)
-	// 	}
-	// }
-	// gridTemplate.map((cell) => {
-	// 	console.log(cell)
-	// 	});
-	// ArrowUp => row - 1
 	// ArrowDown => row +1
+	if (arrow === "ArrowDown") {
+		const moveDown = () => {
+			for (let i = rowLength.value - 2; i > -1; i--) {
+				for (let j = 0; j < colLength.value; j++) {
+					if (gridContent[i][j] !== 0) {
+						let k = i + 1;
+						while (k < rowLength.value && gridContent[k][j] === 0) {
+							k++;
+						}
+						const temp = gridContent[i][j];
+						gridContent[i][j] = 0;
+						gridContent[k - 1][j] = temp;
+					}
+				}
+			}
+		};
+		const mergeDown = () => {
+			for (let i = rowLength.value - 2; i > -1; i--) {
+				for (let j = 0; j < colLength.value; j++) {
+					if (gridContent[i + 1][j] === gridContent[i][j]) {
+						score.value += gridContent[i + 1][j] * 2;
+						gridContent[i + 1][j] = gridContent[i + 1][j] * 2;
+						gridContent[i][j] = 0;
+					}
+				}
+			}
+		};
+
+		moveDown();
+		mergeDown();
+		moveDown();
+		fillRandomCell();
+	}
+
 	// ArrowLeft => col -1
+	if (arrow === "ArrowLeft") {
+		const moveDown = () => {
+			for (let i = 0; i < rowLength.value; i++) {
+				for (let j = 1; j < colLength.value; j++) {
+					if (gridContent[i][j] !== 0) {
+						let k = j - 1;
+						while (k > -1 && gridContent[i][k] === 0) {
+							k--;
+						}
+						const temp = gridContent[i][j];
+						gridContent[i][j] = 0;
+						gridContent[i][k + 1] = temp;
+					}
+				}
+			}
+		};
+		const mergeDown = () => {
+			for (let i = 0; i < rowLength.value; i++) {
+				for (let j = 1; j < colLength.value; j++) {
+					if (gridContent[i][j - 1] === gridContent[i][j]) {
+						score.value += gridContent[i][j - 1] * 2;
+						gridContent[i][j - 1] = gridContent[i][j - 1] * 2;
+						gridContent[i][j] = 0;
+					}
+				}
+			}
+		};
+
+		moveDown();
+		mergeDown();
+		moveDown();
+		fillRandomCell();
+	}
+
 	// ArrowRight => col +1
+	if (arrow === "ArrowRight") {
+		let haveMoved = false;
+		const moveDown = () => {
+			for (let i = 0; i < rowLength.value; i++) {
+				for (let j = colLength.value - 2; j > -1; j--) {
+					if (gridContent[i][j] !== 0) {
+						let k = j + 1;
+						while (k < rowLength.value && gridContent[i][k] === 0) {
+							haveMoved = true;
+							k++;
+						}
+						const temp = gridContent[i][j];
+						gridContent[i][j] = 0;
+						gridContent[i][k - 1] = temp;
+					}
+				}
+			}
+		};
+		const mergeDown = () => {
+			for (let i = 0; i < rowLength.value; i++) {
+				for (let j = colLength.value - 2; j > -1; j--) {
+					if (gridContent[i][j + 1] === gridContent[i][j]) {
+						haveMoved = true;
+						score.value += gridContent[i][j + 1] * 2;
+						gridContent[i][j + 1] = gridContent[i][j + 1] * 2;
+						gridContent[i][j] = 0;
+					}
+				}
+			}
+		};
+
+		moveDown();
+		mergeDown();
+		moveDown();
+		if (haveMoved) {
+			fillRandomCell();
+		}
+	}
 };
-
-// const showKey = (e: Event) => {
-// 	e.preventDefault();
-// 	console.log(e);
-// };
-
-// const arrowUp = () => {
-// 	console.log("up");
-// };
-
-/////////  emits /////////
-// const emit = defineEmits<{
-// 	(e: "emitFromChild", message: string): void;
-// 	(e: "autreEmit"): void;
-// }>();
-/////////////////////////
-// const emitFunc = () => {
-// 	emit("autreEmit");
-// };
-
-////////////   computed  ///////////////
-// const publishedBooksMessage = computed(() => {
-//   return author.books.length > 0 ? 'Yes' : 'No'
-// })
 </script>
 
 <style>
@@ -165,8 +233,7 @@ const move = (arrow: string) => {
 	width: 25vw;
 	height: 25vw;
 	margin: 0 auto;
-	/* display: flex;
-	flex-wrap: wrap; */
+	border-radius: 5px;
 }
 .row {
 	display: flex;

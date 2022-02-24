@@ -3,14 +3,18 @@
 	<div :style="{ width: `${100 / colLength}%` }" class="cell">
 		<!-- <p class="cellPos">row{{ row }} - col{{ col }}</p> -->
 
-		<div v-if="content > 0" :class="valNumToColorClass" class="numberValue">
+		<div
+			v-if="content > 0"
+			:class="[{ grow: merged }, valNumToColorClass]"
+			class="numberValue"
+		>
 			{{ content }}
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 // interface Cell {
 // 	row: number;
@@ -25,9 +29,19 @@ interface Props {
 }
 const props = defineProps<Props>();
 const colLength = props.colLength;
-// const col = ref(props.cell.col);
-// const row = props.cell.row;
-// const numberValue = props.cell.numberValue;
+const merged = ref(false);
+
+watch(
+	() => props.content,
+	(newVal, oldVal) => {
+		if (newVal === oldVal * 2) {
+			merged.value = true;
+			setTimeout(() => {
+				merged.value = false;
+			}, 150);
+		}
+	}
+);
 
 const valNumToColorClass = computed(() => {
 	// switch (numberValue) {
@@ -66,6 +80,7 @@ const valNumToColorClass = computed(() => {
 	z-index: 1;
 }
 .numberValue {
+	border-radius: 5px;
 	position: absolute;
 	background-color: burlywood;
 	width: 100%;
@@ -77,6 +92,11 @@ const valNumToColorClass = computed(() => {
 	font-size: 2vw;
 	font-weight: bold;
 	color: brown;
+	transition: all 20ms;
+}
+.grow {
+	transform: scale(1.1, 1.1);
+	transition: all 20ms;
 }
 .two {
 	background-color: rgb(238, 228, 218);
