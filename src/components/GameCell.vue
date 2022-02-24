@@ -1,9 +1,10 @@
 <template>
+	<!-- :style="{ width: `${100 / colLength}%`, height: `${100 / colLength}%` }" -->
 	<div :style="{ width: `${100 / colLength}%` }" class="cell">
-		<p class="cellPos">cell {{ row }} - {{ col }}</p>
+		<!-- <p class="cellPos">row{{ row }} - col{{ col }}</p> -->
 
-		<div v-if="numVal > 0" :class="valNumToColorClass" class="numVal">
-			{{ numVal }}
+		<div v-if="content > 0" :class="valNumToColorClass" class="numberValue">
+			{{ content }}
 		</div>
 	</div>
 </template>
@@ -11,23 +12,26 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 
-interface Pos {
-	col: number;
-	row: number;
-}
+// interface Cell {
+// 	row: number;
+// 	col: number;
+// 	numberValue: number;
+// }
 
 interface Props {
-	colLength: number; // for style width
-	pos: Pos;
-	numVal: number; // props? ou dans component?
+	colLength: number; // for style width and height
+	// cell: Cell;
+	content: number;
 }
 const props = defineProps<Props>();
 const colLength = props.colLength;
-const col = ref(props.pos.col);
-const row = props.pos.row;
+// const col = ref(props.cell.col);
+// const row = props.cell.row;
+// const numberValue = props.cell.numberValue;
 
 const valNumToColorClass = computed(() => {
-	switch (props.numVal) {
+	// switch (numberValue) {
+	switch (props.content) {
 		case 2:
 			return "two";
 		case 4:
@@ -61,7 +65,7 @@ const valNumToColorClass = computed(() => {
 .cellPos {
 	z-index: 1;
 }
-.numVal {
+.numberValue {
 	position: absolute;
 	background-color: burlywood;
 	width: 100%;
